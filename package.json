@@ -1,6 +1,6 @@
 {
   "name": "gproj",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Git Project Manager",
   "main": "cli.js",
   "scripts": {
