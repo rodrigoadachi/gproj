@@ -1,0 +1,5 @@
+*/
+config.json
+*.bkp
+package-lock.json
+yarn.lock
