@@ -30,7 +30,6 @@ function backupEnvFiles(projectFolder, configFolder, project) {
 }
 
 function readConfigJson(configJson) {
-  const currentDirectory = process.cwd();
   const jsonData = JSON.parse(fs.readFileSync(configJson, 'utf8'));
 
   for (const project of jsonData.projects || []) {

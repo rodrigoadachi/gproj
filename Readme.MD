@@ -80,6 +80,12 @@ Você também pode passar o argumento --backup para fazer o backup de seus arqui
 gproj --backup
 ```
 
+Você pode usar o argumento --clean para remover pastas e arquivos de bloqueio.
+
+```
+gproj --clean
+```
+
 ## Contribuição
 
 Contribuições são sempre bem-vindas. Veja CONTRIBUTING.md para informações sobre como contribuir para este projeto.

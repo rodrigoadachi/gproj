@@ -5,6 +5,7 @@ const { execSync } = require('child_process');
 const path = require('path');
 const yargs = require('yargs');
 const backupenvs = require('./backupenvs.js');
+const cleanfolders = require('./cleanfolders.js');
 const packageJson = require('./package.json');
 
 // Define os argumentos da linha de comando usando o yargs
@@ -20,9 +21,9 @@ const argv = yargs
   .option('backup', {
     describe: 'Executar script de backup de arquivos .env'
   })
-  .option('version', {
-    alias: 'v',
-    describe: 'Mostrar versão do pacote',
+  .option('clean', {
+    alias: 'cls',
+    describe: 'Remove pastas e arquivos de lock',
     boolean: true
   })
   .option('help', {
@@ -42,6 +43,7 @@ const argv = yargs
     yargs.showHelp();
     process.exit(0);
   }
+  
   
 // Função para criar uma pasta se ela não existir
 function createFolder(path) {
@@ -223,5 +225,11 @@ const configPath = path.resolve(process.cwd(), argv.config || './config.json');
 
 if (argv.backup)
   backupenvs.readConfigJson(configPath)
-else
+else if (argv.clean) {
+  const jsonData = JSON.parse(fs.readFileSync(configPath, 'utf8')); // Corrigido para usar configPath
+  const targetDirectory = jsonData.config?.path || './projects';
+  const foldersToDelete = ['node_modules', 'vendor'];
+  cleanfolders.deleteFoldersRecursively(targetDirectory, foldersToDelete);
+}
+ else
   readConfigJson(configPath);
