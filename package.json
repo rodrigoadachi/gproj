@@ -1,6 +1,6 @@
 {
   "name": "gproj",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Git Project Manager",
   "main": "cli.js",
   "scripts": {
@@ -17,8 +17,6 @@
     "nodemon": "^3.0.3"
   },
   "dependencies": {
-    "fs": "^0.0.1",
-    "path": "^0.12.7",
     "yargs": "^17.7.2"
   }
 }
