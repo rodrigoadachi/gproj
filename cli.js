@@ -1,8 +1,11 @@
+#!/usr/bin/env node
+
 const fs = require('fs');
 const { execSync } = require('child_process');
 const path = require('path');
 const yargs = require('yargs');
 const backupenvs = require('./backupenvs.js');
+const packageJson = require('./package.json');
 
 // Define os argumentos da linha de comando usando o yargs
 const argv = yargs
@@ -17,8 +20,29 @@ const argv = yargs
   .option('backup', {
     describe: 'Executar script de backup de arquivos .env'
   })
+  .option('version', {
+    alias: 'v',
+    describe: 'Mostrar versão do pacote',
+    boolean: true
+  })
+  .option('help', {
+    alias: 'h',
+    describe: 'Mostrar ajuda',
+    boolean: true
+  })
   .argv;
 
+  if (argv.version) {
+    console.log(`Versão do pacote: ${packageJson.version}`);
+    process.exit(0);
+  }
+  
+  // Exibe a ajuda se o argumento --help for fornecido
+  if (argv.help) {
+    yargs.showHelp();
+    process.exit(0);
+  }
+  
 // Função para criar uma pasta se ela não existir
 function createFolder(path) {
   try {
@@ -195,7 +219,7 @@ function readConfigJson(configPath) {
 }
 
 // Lê o arquivo de configuração JSON
-const configPath = argv.config || './config.json';
+const configPath = path.resolve(process.cwd(), argv.config || './config.json');
 
 if (argv.backup)
   backupenvs.readConfigJson(configPath)
