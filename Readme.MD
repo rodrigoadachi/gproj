@@ -1,95 +1,96 @@
 # gproj
 
-## Descrição
+## Description
 
-gproj é um pacote npm que permite organizar seus repositórios em pastas por projeto, cria tasks para o vscode e ajuda com os backups dos arquivos .env
+gproj is an npm package that allows you to organize your repositories into project folders, create tasks for vscode, and help with backups of .env files.
 
-## Instalação
+## Installation
 
-Para instalar o gproj globalmente, você pode usar o seguinte comando:
+To install gproj globally, you can use the following command:
 
 ```bash
 npm install -g gproj
 ```
 
-## Configuração
+## Configuration
 
-O gproj usa um arquivo de configuração JSON para…
+gproj uses a JSON configuration file to...
 
-Exemplo de arquivo de configuração config.json:
+Example of a config.json configuration file:
 
 ```
 {
   "config": {
-    "path": "./projects", << Pasta base onde serão organizados os repositórios
-    "envfiles": "./envfiles" << Pasta onde serão armazenados os arquivos env
+    "path": "./projects", << Base folder where repositories will be organized
+    "envfiles": "./envfiles" << Folder where env files will be stored
   },
   "projects": [
     {
-      "name": "client-projeto", << Nome do projeto
-      "path": "client/projeto", << Pasta do projeto
+      "name": "client-project", << Project name
+      "path": "client/project", << Project folder
       "repositories": [
         {
-          "path": "api", << Pasta que será criada dentro do projeto para este repositório
-          "repository": "git@ssh....." << Caminho do repositório
+          "path": "api", << Folder that will be created inside the project for this repository
+          "repository": "git@ssh....." << Repository path
         },
-        ... << Pode adicionar mais repositórios
+        ... << You can add more repositories
       ],
-      "tasks": [ << Tasks é uma ferramenta do VSCode para automatizar os processos
+      "tasks": [ << Tasks is a VSCode tool to automate processes
         {
-          "label": "setupNodeEnv", << Nome da tarefa
-          "command": "cd ./api; yarn install", << Comando de execução da tarefa
-          "group": "install" << Grupo de terminais
+          "label": "setupNodeEnv", << Task name
+          "command": "cd ./api; yarn install", << Task execution command
+          "group": "install" << Terminal group
         },
         {
           "label": "api",
           "command": "cd ./api; yarn start:dev",
           "group": "api",
-          "dependsOn": ["setupNodeEnv"] << Dependencia
+          "dependsOn": ["setupNodeEnv"] << Dependency
         },
-        ... << Pode adicionar mais tasks
+        ... << You can add more tasks
       ]
     }
-    ... << Pode adicionar mais projetos
+    ... << You can add more projects
+  ]
 }
 ```
 
-## Uso
+## Usage
 
-Aqui estão alguns exemplos de como você pode usar o gproj:
+Here are some examples of how you can use gproj:
 
-Na pasta onde está o arquivo conf.json você pode rodar o comando abaixo onde ele iniciará a organizar as pastas, baixar os repositórios apontados no arquivo de configuração e aplicará os arquivos .env
+In the folder where the conf.json file is located, you can run the command below which will start organizing the folders, download the repositories pointed to in the configuration file and apply the .env files
 
 ```
 gproj 
 ```
 
-Você também pode passar argumentos para o gproj da seguinte maneira:
+You can also pass arguments to gproj as follows:
 
 ```
 gproj --config ./myConfigFile.json --envfiles ./backup/envs
 ```
 
---config << Caminho do arquivo de configuração, caso não passe este argumento, procurará o config.json
+--config << Path to the configuration file, if you don't pass this argument, it will look for config.json
 
---envfiles << Caminho da pasta de backup dos arquivos de variáveis de ambiente, por padrão buscará no arquivo de configuração, caso não tenha sido definido procurará por ./envfiles
+--envfiles << Path to the backup folder of environment variable files, by default it will look in the configuration file, if it is not defined it will look for ./envfiles
 
-Você também pode passar o argumento --backup para fazer o backup de seus arquivos .env
+You can also pass the --backup argument to backup your .env files
 
 ```
 gproj --backup
 ```
 
-Você pode usar o argumento --clean para remover pastas e arquivos de bloqueio.
+You can use the --clean argument to remove folders and lock files.
 
 ```
 gproj --clean
 ```
 
-## Contribuição
+## Contributing
 
-Contribuições são sempre bem-vindas. Veja CONTRIBUTING.md para informações sobre como contribuir para este projeto.
+Contributions are always welcome. See CONTRIBUTING.md for information on how to contribute to this project.
 
 ## Licença
 
-Este projeto está licenciado sob a licença MIT. Veja o arquivo LICENSE.md para mais detalhes.
+This project is licensed under the MIT license. See the LICENSE.md file for more details.

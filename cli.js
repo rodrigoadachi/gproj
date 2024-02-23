@@ -8,70 +8,63 @@ const backupenvs = require('./backupenvs.js');
 const cleanfolders = require('./cleanfolders.js');
 const packageJson = require('./package.json');
 
-// Define os argumentos da linha de comando usando o yargs
 const argv = yargs
   .option('config', {
     alias: 'c',
-    describe: 'Caminho para o arquivo de configuração JSON'
+    describe: 'Path to the JSON configuration file'
   })
   .option('envfiles', {
     alias: 'e',
-    describe: 'Caminho para a pasta de arquivos .env'
+    describe: 'Path to the .env files folder'
   })
   .option('backup', {
-    describe: 'Executar script de backup de arquivos .env'
+    describe: 'Run .env files backup script'
   })
   .option('clean', {
     alias: 'cls',
-    describe: 'Remove pastas e arquivos de lock',
+    describe: 'Remove folders and lock files',
     boolean: true
   })
   .option('help', {
     alias: 'h',
-    describe: 'Mostrar ajuda',
+    describe: 'Show help',
     boolean: true
   })
   .argv;
 
   if (argv.version) {
-    console.log(`Versão do pacote: ${packageJson.version}`);
+    console.log(`Package version: ${packageJson.version}`);
     process.exit(0);
   }
   
-  // Exibe a ajuda se o argumento --help for fornecido
   if (argv.help) {
     yargs.showHelp();
     process.exit(0);
   }
   
   
-// Função para criar uma pasta se ela não existir
 function createFolder(path) {
   try {
     fs.mkdirSync(path, { recursive: true });
-    console.log(`Pasta criada em: ${path}`);
+    console.log(`Folder created at: ${path}`);
   } catch (error) {
-    console.error(`Falha ao criar pasta: ${error}`);
+    console.error(`Failed to create folder: ${error}`);
   }
 }
 
-// Função para baixar um repositório Git
 function downloadRepository(url, path) {
   try {
-    console.log(`Baixando repositório em: ${path} ...`);
+    console.log(`Downloading repository to: ${path} ...`);
     execSync(`git clone ${url} ${path}`);
-    console.log(`Download concluído!`);
+    console.log(`Download complete`);
   } catch (error) {
-    console.error(`Falha ao baixar repositório: ${error}`);
+    console.error(`Failed to download repository: ${error}`);
   }
 }
 
-// Função para copiar arquivos .env para cada repositório
 function copyEnvFiles(project, baseFolder, envFilesPath, repoPath) {
   const envFileName = `${project.name}-${repoPath}.env`;
-  // Construa o caminho completo para a pasta de arquivos .env
   const envFolderPath = path.resolve(envFilesPath || './envfiles');
-  // Construa o caminho completo para o arquivo .env
   const envFilePath = path.join(envFolderPath, envFileName);
   const destinationPath = path.join(baseFolder, project.path, repoPath);
   const destinationEnvPath = path.join(destinationPath, '.env');
@@ -80,11 +73,10 @@ function copyEnvFiles(project, baseFolder, envFilesPath, repoPath) {
     fs.copyFileSync(envFilePath, destinationEnvPath);
     console.log(`${envFileName} file copied to ${destinationEnvPath}`);
   } else {
-    console.log(`Arquivo .env não encontrado para ${project.name}`);
+    console.log(`.env file not found for ${project.name}`);
   }
 }
 
-// Função para criar as tarefas VSCode
 function createTasks(project) {
   const tasksJson = {
     version: "2.0.0",
@@ -150,21 +142,16 @@ function createTasks(project) {
   return tasksJson;
 }
 
-// Função para processar um projeto
 function processProject(project, baseFolder, envFilesPath) {
-  // Cria a pasta base conforme o config.path, se ainda não existir
   createFolder(baseFolder);
-
   if (!project.repositories) {
     console.error(`O projeto ${project.name} não possui repositórios definidos.`);
     return;
   }
 
-  // Cria a pasta do projeto conforme project.path
   const projectFolderPath = path.join(baseFolder, project.path);
   createFolder(projectFolderPath);
 
-  // Clone todos os repositórios do projeto
   project.repositories.forEach(repo => {
     const folderDestination = path.join(projectFolderPath, repo.path);
     const urlRepository = repo.repository;
@@ -173,7 +160,6 @@ function processProject(project, baseFolder, envFilesPath) {
     downloadRepository(urlRepository, folderDestination);
   });
 
-  // Após clonar todos os repositórios, copie os arquivos .env
   project.repositories.forEach(repo => {
     copyEnvFiles(project, baseFolder, envFilesPath, repo.path);
   });
@@ -186,10 +172,9 @@ function processProject(project, baseFolder, envFilesPath) {
   fs.writeFileSync(tasksJsonPath, JSON.stringify(tasksJsonContent, null, 2));
 }
 
-// Função para ler o arquivo de configuração JSON
 function readConfigJson(configPath) {
   if (!fs.existsSync(configPath)) {
-    console.error(`O arquivo de configuração ${configPath} não foi encontrado.`);
+    console.error(`Configuration file ${configPath} not found.`);
     return;
   }
 
@@ -197,9 +182,9 @@ function readConfigJson(configPath) {
 
   let baseFolder;
   if (configFileContent.config && configFileContent.config.path) {
-    baseFolder = path.resolve(configFileContent.config.path); // Resolvendo o caminho absoluto do diretório base
+    baseFolder = path.resolve(configFileContent.config.path);
   } else {
-    console.log("Parâmetro 'config.path' não encontrado no arquivo JSON. Usando a pasta padrão './projects'.");
+    console.log("Parameter 'config.path' not found in JSON file. Using the default folder './projects'.");
     baseFolder = path.resolve('./projects');
   }
 
@@ -209,7 +194,7 @@ function readConfigJson(configPath) {
   } else if (configFileContent.config && configFileContent.config.envfiles) {
     envFilesFolder = configFileContent.config.envfiles;
   } else {
-    console.log("Parâmetro 'envfiles' não definido no argumento da linha de comando nem no arquivo JSON. Usando a pasta padrão './envfiles'.");
+    console.log("Parameter 'envfiles' not defined in the command line argument or JSON file. Using the default folder './envfiles'.");
     envFilesFolder = './envfiles';
   }
 
@@ -220,13 +205,26 @@ function readConfigJson(configPath) {
   });
 }
 
-// Lê o arquivo de configuração JSON
 const configPath = path.resolve(process.cwd(), argv.config || './config.json');
+let jsonData;
+
+try {
+  jsonData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+} catch (e) {
+  console.error('Error reading configuration file. Check if the file is not empty and is well formatted.');
+  process.exit(1);
+}
+
+if (!jsonData || Object.keys(jsonData).length === 0) {
+  console.error('The configuration file is empty. Please provide a valid configuration file.');
+  process.exit(1);
+}
+
 
 if (argv.backup)
   backupenvs.readConfigJson(configPath)
 else if (argv.clean) {
-  const jsonData = JSON.parse(fs.readFileSync(configPath, 'utf8')); // Corrigido para usar configPath
+  const jsonData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
   const targetDirectory = jsonData.config?.path || './projects';
   const foldersToDelete = ['node_modules', 'vendor'];
   cleanfolders.deleteFoldersRecursively(targetDirectory, foldersToDelete);
